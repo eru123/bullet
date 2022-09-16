@@ -1,5 +1,5 @@
 # Build stage
-FROM node:lts-alpine AS build
+FROM node:15-alpine AS build
 WORKDIR /build
 
 # Install modules with dev dependencies
@@ -13,7 +13,13 @@ RUN yarn build
 
 # Regenerate node modules as production
 RUN rm -rf ./node_modules
-RUN yarn install --production --frozen-lockfile
+RUN apk --no-cache add cmake clang clang-dev make gcc g++ libc-dev linux-headers
+RUN apk add --no-cache --virtual .gyp \
+        python \
+        make \
+        g++ \
+    && yarn install --production --frozen-lockfile \
+    && apk del .gyp
 
 # Bundle stage
 FROM node:15-alpine AS production

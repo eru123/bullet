@@ -23,6 +23,14 @@ export default async function (req, res) {
 		if (!admin && project.owner !== accountId) return res.status(403).send()
 
 		if (req.method === 'POST') {
+			let currentDeployments = await prisma.deployments.count({ where: { project: project.id, status: 'BUILDING' } })
+			if (currentDeployments > 0) return res.status(409).send('Concurrent builds are not available')
+
+			if (rollback.type === 'github') {
+				let { access_token } = await github(req, res, accountId)
+				rollback.authedOrigin = String(rollback.origin).replace('[REDACTED]', access_token)
+			}
+
 			let deployment = await prisma.deployments.create({
 				data: {
 					manual: true,
@@ -32,7 +40,7 @@ export default async function (req, res) {
 					branch: rollback.branch,
 					commit: rollback.commit,
 					message: rollback.message,
-					status: 'QUEUED',
+					status: 'BUILDING',
 					projects: {
 						connect: {
 							id: project.id,
@@ -46,16 +54,11 @@ export default async function (req, res) {
 				},
 			})
 
-			if (rollback.type === 'github') {
-				let { access_token } = await github(req, res, accountId)
-				rollback.origin = String(rollback.origin).replace('[REDACTED]', access_token)
-			}
-
 			await log(req, accountId, `Rollback to ${rollback.id} for ${project.name} was triggered`)
 
 			res.status(202).json(deployment)
 
-			await build(project.id, deployment.id, rollback.origin, rollback.commit || rollback.branch)
+			await build(project.id, deployment.id, rollback.authedOrigin, rollback.commit)
 		} else {
 			res.status(405).send()
 		}

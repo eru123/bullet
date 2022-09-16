@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { Button, Nav, Input, DatabaseSidebar, Container } from '@components'
+import { Button, Nav, Input, DatabaseSidebar } from '@components'
 import { useApi, useValidSession } from '@hooks'
-import * as timeago from 'timeago.js'
+import {dateFormat} from '@utils'
 import toast from 'react-hot-toast'
 import cronstrue from 'cronstrue'
 
@@ -74,7 +74,7 @@ export default function Project() {
 	if (!database) return null
 
 	return (
-		<Container>
+		<div className='max-w-6xl m-auto p-8'>
 			<Nav active={null} />
 			<div className='flex'>
 				<DatabaseSidebar
@@ -96,7 +96,7 @@ export default function Project() {
 											<p className='opacity-40'>Status</p>
 											<p>{database.backup !== null ? 'Enabled' : 'Disabled'}</p>
 											<p className='opacity-40'>Initialized</p>
-											<p>{timeago.format(database.backup && database.backup.initialized)}</p>
+											<p>{dateFormat(database.backup && database.backup.initialized)}</p>
 											<p className='opacity-40'>Schedule</p>
 											<p>{humanCron(database.backup.schedule)}</p>
 											<p className='opacity-40'>Encrypted</p>
@@ -180,7 +180,7 @@ export default function Project() {
 					</div>
 				</main>
 			</div>
-		</Container>
+		</div>
 	)
 }
 

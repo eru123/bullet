@@ -58,24 +58,6 @@ export function Status({ status }) {
 				text: 'Deploying',
 				ping: true,
 			})
-		if (status === 'INITIALIZING')
-			setItem({
-				color: 'royalblue',
-				text: 'Initializing',
-				ping: true,
-			})
-		if (status === 'QUEUED')
-			setItem({
-				color: 'teal',
-				text: 'Queued',
-				ping: true,
-			})
-		if (status === 'CANCELED')
-			setItem({
-				color: 'gray',
-				text: 'Canceled',
-				ping: false,
-			})
 	}, [status])
 
 	return (

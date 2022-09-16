@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
-import { Input, Button, Nav, Container } from '@components'
+import { Input, Button, Nav } from '@components'
 import { useApi, useValidSession } from '@hooks'
 import toast from 'react-hot-toast'
 import qrcode from 'qrcode'
 
-export default function Settings({ host }) {
+export default function Settings({scheme, host}) {
+	const baseUri = `${scheme}://${host}`;
 	const [user, setUser] = useState<any>({})
 	const [ips, setIps] = useState<any>([])
 	const [mfa, setMfa] = useState<any>(null)
@@ -96,7 +97,7 @@ export default function Settings({ host }) {
 	}
 
 	return (
-		<Container>
+		<div className='max-w-6xl m-auto p-8'>
 			<Nav active='settings' />
 			<div className='flex'>
 				<main className='bg-white rounded-lg shadow w-full p-10'>
@@ -136,11 +137,11 @@ export default function Settings({ host }) {
 											name: 'My Github Connection',
 											public: false,
 											request_oauth_on_install: true,
-											url: `http://${host}`,
-											redirect_url: `http://${host}/api/github/connect`,
-											callback_urls: [`http://${host}/api/github/connect`],
+											url: baseUri,
+											redirect_url: `${baseUri}/api/github/connect`,
+											callback_url: `${baseUri}/api/github/connect`,
 											hook_attributes: {
-												url: `http://${host}/api/github/webhook`,
+												url: `${baseUri}/api/github/webhook`,
 												active: true,
 											},
 											default_permissions: {
@@ -220,13 +221,16 @@ export default function Settings({ host }) {
 					</div>
 				</main>
 			</div>
-		</Container>
+		</div>
 	)
 }
 
 export async function getServerSideProps(context) {
+	const {referer} = context.req.headers;
+	const scheme = context.req.headers['x-forwarded-proto'] || (referer && referer.includes("https://") ? "https": "http");
 	return {
 		props: {
+			scheme,
 			host: context.req.headers['host'] || null,
 		},
 		...useValidSession(context),

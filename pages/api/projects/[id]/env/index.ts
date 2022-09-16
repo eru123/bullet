@@ -1,7 +1,6 @@
-import { decrypt, encrypt } from '@server/crypto'
-import getSession from '@server/session'
 import ssh from '@server/ssh'
 import prisma from '@server/db'
+import getSession from '@server/session'
 import log from '@server/log'
 
 export default async function (req, res) {
@@ -23,12 +22,6 @@ export default async function (req, res) {
 			let envVars = await prisma.environment_variables.findMany({
 				where: { project: project.id },
 			})
-
-			envVars = envVars.map((i) => ({
-				...i,
-				value: decrypt(i.value),
-			}))
-
 			res.json(envVars)
 		} else if (req.method === 'POST') {
 			let { key, value } = req.body
@@ -40,7 +33,7 @@ export default async function (req, res) {
 						},
 					},
 					key,
-					value: encrypt(value),
+					value,
 					accounts: {
 						connect: {
 							id: accountId,

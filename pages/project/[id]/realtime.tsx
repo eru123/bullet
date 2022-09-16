@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { Status, Spinner, Nav, ProjectSidebar, Nothing, Container } from '@components'
+import { Status, Spinner, Nav, ProjectSidebar, Nothing } from '@components'
 import { useApi, useValidSession, useInterval } from '@hooks'
 import ansi from 'ansi_up'
 
@@ -37,7 +37,7 @@ export default function Realtime() {
 	if (!project) return null
 
 	return (
-		<Container>
+		<div className='max-w-6xl m-auto p-8'>
 			<Nav active={null} />
 			<div className='flex flex-col md:flex-row'>
 				<ProjectSidebar id={project.id} title={project.name} active='realtime' />
@@ -117,7 +117,7 @@ export default function Realtime() {
 					)}
 				</main>
 			</div>
-		</Container>
+		</div>
 	)
 }
 
