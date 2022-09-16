@@ -2,7 +2,7 @@
 
 apt update && apt upgrade -y
 update-rc.d apache2 disable && systemctl stop apache2
-apt install htop curl build-essential
+apt install -y htop curl build-essential
 ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
 
 HOST_IP=$(curl -sS https://ipinfo.io/ip)
