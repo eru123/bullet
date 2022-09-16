@@ -1,5 +1,10 @@
 #!/bin/bash
 
+apt update && apt upgrade -y
+update-rc.d apache2 disable && systemctl stop apache2
+apt install htop curl build-essential
+ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
+
 HOST_IP=$(curl -sS https://ipinfo.io/ip)
 CURRENT_USER=$(whoami)
 CURRENT_VERSION=$(curl -sS https://api.github.com/repos/dokku/dokku/releases/latest | grep -oP '(?<="tag_name": ")[^"]*')
